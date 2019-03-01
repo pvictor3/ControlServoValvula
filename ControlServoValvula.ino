@@ -1,13 +1,31 @@
 #include <Servo.h>
+#include <avr/sleep.h>
+#include <avr/power.h>
 
 Servo servoMotor;
-int pinOpen = 2;
-int pinClose = 3;
+int pinOpen = 3;
+int pinClose = 4;
 int pinEnable = 8;
 int pinPWM = 9;
 int posOpen = 0;
 int posClose = 180;
 String estado = "open";
+int pin2 = 2;
+int seconds = 0;
+
+void pin2Int(){
+  detachInterrupt(digitalPinToInterrupt(pin2));
+  }
+
+void enterSleep(){
+  attachInterrupt(digitalPinToInterrupt(pin2), pin2Int, LOW);
+  delay(100);
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable();
+  sleep_mode();
+  /**/
+  sleep_disable();
+  }
 
 void setup() {
   // put your setup code here, to run once:
@@ -31,13 +49,16 @@ void loop() {
   }
   if(estado.equals("open") && digitalRead(pinOpen) == HIGH){
     estado = "";
-    stopMotor();  
+    stopMotor();
+    enterSleep();  
   }
 
   if(estado.equals("close") && digitalRead(pinClose) == HIGH){
     estado = "";
     stopMotor();
+    enterSleep();
   }
+  
 }
 
 void ejecutar(String estado)
@@ -56,6 +77,7 @@ void ejecutar(String estado)
   {
     estado = "";
     stopMotor();
+    enterSleep();
   }   
  }
 
